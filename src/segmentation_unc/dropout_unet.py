@@ -1,17 +1,17 @@
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, SpatialDropout2D, concatenate
 from tensorflow.keras.models import Model
 
-from groupnorm import GroupNormalization
+from groupnorm import GroupNormalizationCustom
 
 
 def down_stage(inputs, filters, kernel_size=3,
                activation="relu", padding="SAME"):
     conv = Conv2D(filters, kernel_size,
                   activation=activation, padding=padding)(inputs)
-    conv = GroupNormalization()(conv)
+    conv = GroupNormalizationCustom()(conv)
     conv = Conv2D(filters, kernel_size,
                   activation=activation, padding=padding)(conv)
-    conv = GroupNormalization()(conv)
+    conv = GroupNormalizationCustom()(conv)
     pool = MaxPooling2D()(conv)
     return conv, pool
 
@@ -20,17 +20,17 @@ def up_stage(inputs, skip, filters, kernel_size=3,
              activation="relu", padding="SAME"):
     up = UpSampling2D()(inputs)
     up = Conv2D(filters, 2, activation=activation, padding=padding)(up)
-    up = GroupNormalization()(up)
+    up = GroupNormalizationCustom()(up)
 
     merge = concatenate([skip, up])
-    merge = GroupNormalization()(merge)
+    merge = GroupNormalizationCustom()(merge)
 
     conv = Conv2D(filters, kernel_size,
                   activation=activation, padding=padding)(merge)
-    conv = GroupNormalization()(conv)
+    conv = GroupNormalizationCustom()(conv)
     conv = Conv2D(filters, kernel_size,
                   activation=activation, padding=padding)(conv)
-    conv = GroupNormalization()(conv)
+    conv = GroupNormalizationCustom()(conv)
     conv = SpatialDropout2D(0.5)(conv, training=True)
 
     return conv
